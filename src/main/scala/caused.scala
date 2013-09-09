@@ -1,4 +1,4 @@
-package findpaths
+package caused
 
 import org.neo4j.graphdb.{GraphDatabaseService, Direction, Node, Relationship, PropertyContainer, DynamicRelationshipType}
 import org.neo4j.kernel.Traversal
@@ -15,11 +15,11 @@ import net.liftweb.json._
 import net.liftweb.json.Extraction._
 
 @Path("/caused")
-class findpaths {
+class caused {
 
   implicit val formats = net.liftweb.json.DefaultFormats
 
-  val causesType = DynamicRelationshipType.withName( "CAUSES" )
+  val causesType = DynamicRelationshipType.withName( "Causes" )
 
   @POST
   @Path("/findcaused/")
@@ -27,26 +27,28 @@ class findpaths {
   def findCaused(@FormParam("ids")jsonIds:String, @Context db:GraphDatabaseService) = {
     val tx = db.beginTx
     try {
-      val ids:List[Int] = Serialization.read(jsonIds)
+      val ids:List[Long] = Serialization.read[List[Long]](jsonIds)
       val nodes:List[Node] = ids.map(e => db.getNodeById(e))
       val rootNodes = nodes.filter(n => !n.hasRelationship(causesType, Direction.INCOMING))
       val outCausesExpander = Traversal.pathExpanderForTypes(causesType, Direction.OUTGOING)
       val inCausesExpander = Traversal.pathExpanderForTypes(causesType, Direction.INCOMING)
-      val td = Traversal.description
-      td.depthFirst
-      td.expand(outCausesExpander)
+      val td = Traversal.description.expand(outCausesExpander)
       val traverser = td.traverse(rootNodes:_*) // :_* expands a list so varargs work
       val potentialCausedNodes = traverser.nodes.asScala
       potentialCausedNodes.map(n => tx.acquireWriteLock(n)) // this will hopefully make this thread safe
+      println(potentialCausedNodes.map(e => e.getId)) // debug
       val causedNodes = potentialCausedNodes.filter(n => {
-        val backtd = Traversal.description
-        backtd.depthFirst
-        backtd.expand(inCausesExpander)
+        println("checking potential caused node: " + n.getId)
+        val backtd = Traversal.description.expand(inCausesExpander)
         val backTraverser = backtd.traverse(n)
         var canBeDeleted = true
         for(path <- backTraverser.iterator().asScala) {
-          if(!rootNodes.contains(path.endNode)) {
+          val pathstr = path.nodes.asScala.map(n => ""+n.getId).foldLeft("")((acc, e) => acc + e + ", ")
+          println("checking path: " + pathstr)
+          if(!path.endNode.hasRelationship(causesType, Direction.INCOMING) // is the farthest we can go in this path
+          && !rootNodes.contains(path.endNode)) { // is one of our root nodes
             canBeDeleted = false // this caused node has a root cause not in our start list
+            println("found non-root node: " + path.endNode.getId)
           }
         }
         canBeDeleted
@@ -54,10 +56,11 @@ class findpaths {
       val causedIds = causedNodes.map(n => n.getId).toList
       tx.success
       Response.ok(compact(render(decompose(causedIds))), MediaType.APPLICATION_JSON).build()
+    } catch {
+      case e:Exception => Response.status(500).entity(e.getMessage).build()
     } finally {
       tx.finish
     }
-    Response.status(500).build()
   }
 
 }
