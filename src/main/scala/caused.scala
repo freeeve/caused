@@ -36,19 +36,19 @@ class caused {
       val traverser = td.traverse(rootNodes:_*) // :_* expands a list so varargs work
       val potentialCausedNodes = traverser.nodes.asScala
       potentialCausedNodes.map(n => tx.acquireWriteLock(n)) // this will hopefully make this thread safe
-      println(potentialCausedNodes.map(e => e.getId)) // debug
+      //println(potentialCausedNodes.map(e => e.getId)) // debug
       val causedNodes = potentialCausedNodes.filter(n => {
-        println("checking potential caused node: " + n.getId)
+        //println("checking potential caused node: " + n.getId)
         val backtd = Traversal.description.expand(inCausesExpander)
         val backTraverser = backtd.traverse(n)
         var canBeDeleted = true
         for(path <- backTraverser.iterator().asScala) {
-          val pathstr = path.nodes.asScala.map(n => ""+n.getId).foldLeft("")((acc, e) => acc + e + ", ")
-          println("checking path: " + pathstr)
+          //val pathstr = path.nodes.asScala.map(n => ""+n.getId).foldLeft("")((acc, e) => acc + e + ", ")
+          //println("checking path: " + pathstr)
           if(!path.endNode.hasRelationship(causesType, Direction.INCOMING) // is the farthest we can go in this path
           && !rootNodes.contains(path.endNode)) { // is one of our root nodes
             canBeDeleted = false // this caused node has a root cause not in our start list
-            println("found non-root node: " + path.endNode.getId)
+            //println("found non-root node: " + path.endNode.getId)
           }
         }
         canBeDeleted
