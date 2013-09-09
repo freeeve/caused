@@ -13,7 +13,7 @@ import scala.collection.JavaConverters._
 import net.liftweb.json._
 import net.liftweb.json.Extraction._
 
-@Path("/caused")
+@Path("/")
 class caused(@Context db:GraphDatabaseService) {
 
   implicit val formats = net.liftweb.json.DefaultFormats
