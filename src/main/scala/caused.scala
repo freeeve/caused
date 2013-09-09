@@ -3,7 +3,7 @@ package caused
 import org.neo4j.graphdb.{GraphDatabaseService, Direction, Node, Relationship, PropertyContainer, DynamicRelationshipType}
 import org.neo4j.kernel.Traversal
 
-import javax.ws.rs.{Path, POST, Produces, FormParam}
+import javax.ws.rs.{Path, POST, Produces, FormParam, Consumes}
 import javax.ws.rs.core.Context
 import javax.ws.rs.core.Response
 import javax.ws.rs.core.MediaType
@@ -14,16 +14,17 @@ import net.liftweb.json._
 import net.liftweb.json.Extraction._
 
 @Path("/caused")
-class caused {
+class caused(@Context db:GraphDatabaseService) {
 
   implicit val formats = net.liftweb.json.DefaultFormats
 
   val causesType = DynamicRelationshipType.withName( "Causes" )
 
   @POST
+  @Consumes(Array("text/plain", "application/json"))
   @Path("/findcaused/")
   @Produces(Array("application/json"))
-  def findCaused(@FormParam("ids")jsonIds:String, @Context db:GraphDatabaseService) = {
+  def findCaused(jsonIds:String) = {
     val tx = db.beginTx
     try {
       val ids:List[Long] = Serialization.read[List[Long]](jsonIds)
