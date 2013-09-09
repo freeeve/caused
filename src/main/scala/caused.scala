@@ -54,6 +54,7 @@ class caused {
         canBeDeleted
       })
       val causedIds = causedNodes.map(n => n.getId).toList
+      // causedNodes.map(n => n.delete) // uncomment this if you want to delete the nodes
       tx.success
       Response.ok(compact(render(decompose(causedIds))), MediaType.APPLICATION_JSON).build()
     } catch {
