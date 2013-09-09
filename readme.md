@@ -1,10 +1,11 @@
 ## A simple neo4j unmanaged extension to find caused nodes from a set of root causes
+A node is only returned if it is exclusively caused by the set of root cause nodes passed in.
 
 ### usage example:
 
 #### graph looks like this:
 ```
-(10)-[:Caused]->(9)-[:Caused]->(8)<-[:Caused]-(7)
+(10)-[:Causes]->(9)-[:Causes]->(8)<-[:Causes]-(7)
 ```
 
 #### curl output:
