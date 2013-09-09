@@ -40,15 +40,17 @@ class caused {
         //println("checking potential caused node: " + n.getId)
         val backtd = Traversal.description.expand(inCausesExpander)
         val backTraverser = backtd.traverse(n)
-        var canBeDeleted = true
-        for(path <- backTraverser.iterator().asScala) {
-          //val pathstr = path.nodes.asScala.map(n => ""+n.getId).foldLeft("")((acc, e) => acc + e + ", ")
-          //println("checking path: " + pathstr)
-          if(!path.endNode.hasRelationship(causesType, Direction.INCOMING) // is the farthest we can go in this path
-          && !rootNodes.contains(path.endNode)) { // is one of our root nodes
-            canBeDeleted = false // this caused node has a root cause not in our start list
-            //println("found non-root node: " + path.endNode.getId)
+        def canBeDeleted:Boolean = {
+          for(path <- backTraverser.iterator().asScala) {
+            //val pathstr = path.nodes.asScala.map(n => ""+n.getId).foldLeft("")((acc, e) => acc + e + ", ")
+            //println("checking path: " + pathstr)
+            if(!path.endNode.hasRelationship(causesType, Direction.INCOMING) // is the farthest we can go in this path
+            && !rootNodes.contains(path.endNode)) { // is one of our root nodes
+              return false // this caused node has a root cause not in our start list
+              //println("found non-root node: " + path.endNode.getId)
+            }
           }
+          return true
         }
         canBeDeleted
       })
