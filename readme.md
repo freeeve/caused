@@ -3,6 +3,8 @@ A node is only returned if it is exclusively caused by the set of root cause nod
 
 ### usage example:
 
+`findcaused` takes a JSON array of node ids, and returns a JSON array of node ids that are exclusively caused by the input.
+
 #### graph looks like this:
 ```
 (10)-[:Causes]->(9)-[:Causes]->(8)<-[:Causes]-(7)
