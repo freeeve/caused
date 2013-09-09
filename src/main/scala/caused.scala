@@ -2,9 +2,8 @@ package caused
 
 import org.neo4j.graphdb.{GraphDatabaseService, Direction, Node, Relationship, PropertyContainer, DynamicRelationshipType}
 import org.neo4j.kernel.Traversal
-import org.neo4j.graphdb.traversal.TraversalDescription
 
-import javax.ws.rs._
+import javax.ws.rs.{Path, POST, Produces, FormParam}
 import javax.ws.rs.core.Context
 import javax.ws.rs.core.Response
 import javax.ws.rs.core.MediaType
