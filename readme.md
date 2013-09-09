@@ -10,17 +10,17 @@ A node is only returned if it is exclusively caused by the set of root cause nod
 
 #### curl output:
 ``` shell
-$ curl -X POST --data-urlencode "ids=[10,7,8]" http://localhost:7474/caused/caused/findcaused
+$ curl -X POST -H Content-Type:application/json -d '[10,7,8]' http://localhost:7474/caused/caused/findcaused
 [10,9,8,7] 
-$ curl -X POST --data-urlencode "ids=[10,7]" http://localhost:7474/caused/caused/findcaused
+$ curl -X POST -H Content-Type:application/json -d '[10,7]' http://localhost:7474/caused/caused/findcaused
 [10,9,8,7] 
-$ curl -X POST --data-urlencode "ids=[10]" http://localhost:7474/caused/caused/findcaused
+$ curl -X POST -H Content-Type:application/json -d '[10]' http://localhost:7474/caused/caused/findcaused
 [10,9]
-$ curl -X POST --data-urlencode "ids=[10,9]" http://localhost:7474/caused/caused/findcaused
+$ curl -X POST -H Content-Type:application/json -d '[10,9]' http://localhost:7474/caused/caused/findcaused
 [10,9]
-$ curl -X POST --data-urlencode "ids=[9]" http://localhost:7474/caused/caused/findcaused
+$ curl -X POST -H Content-Type:application/json -d '[9]' http://localhost:7474/caused/caused/findcaused
 [] 
-$ curl -X POST --data-urlencode "ids=[7]" http://localhost:7474/caused/caused/findcaused
+$ curl -X POST -H Content-Type:application/json -d '[7]' http://localhost:7474/caused/caused/findcaused
 [7]
 ```
 
